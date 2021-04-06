@@ -1,10 +1,36 @@
 {
-  
-  
   "version": 2,
-  
-  "projects": {},
-  "cli": {
-    "defaultCollection": "@nrwl/workspace"
-  }
+  "projects": {
+    "sauron": {
+      "root": "packages/sauron",
+      "sourceRoot": "packages/sauron/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": { "lintFilePatterns": ["packages/sauron/**/*.ts"] }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/packages/sauron"],
+          "options": {
+            "jestConfig": "packages/sauron/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/packages/sauron",
+            "tsConfig": "packages/sauron/tsconfig.lib.json",
+            "packageJson": "packages/sauron/package.json",
+            "main": "packages/sauron/src/index.ts",
+            "assets": ["packages/sauron/*.md"]
+          }
+        }
+      }
+    }
+  },
+  "cli": { "defaultCollection": "@nrwl/workspace" }
 }
