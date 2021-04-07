@@ -22,6 +22,14 @@ export function Record(
   };
 }
 
+/**
+ * @decorator
+ *
+ * Define record field
+ * @param order
+ * @param config
+ * @returns
+ */
 export function Field(order: number, config: SchemaType | { new (...args) }) {
   return function (target: unknown, key: string) {
     let field: SchemaType & { order: number };
@@ -37,7 +45,7 @@ export function Field(order: number, config: SchemaType | { new (...args) }) {
         );
       }
 
-      field = { order, type: 'pointer', pointer: record.name };
+      field = { order, type: 'pointer', pointer: record.name, ref: config };
     } else {
       // Schema type as definition
       field = { order, ...config };
@@ -58,6 +66,15 @@ export function Field(order: number, config: SchemaType | { new (...args) }) {
   };
 }
 
+/**
+ * @decorator
+ *
+ * Define array field
+ * @param order
+ * @param items
+ * @param config
+ * @returns
+ */
 export function ArrayField(
   order: number,
   items: SchemaType | { new (...args) },
@@ -74,7 +91,7 @@ export function ArrayField(
       throw new Error(`Unknown ${items} as field. Make sure it used @Record`);
     }
 
-    item = { type: 'pointer', pointer: record.name };
+    item = { type: 'pointer', pointer: record.name, ref: items };
   } else {
     // Schema type as definition
     item = items;

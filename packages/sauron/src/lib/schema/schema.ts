@@ -1,8 +1,6 @@
 import { getRecordData } from './decorators';
 import {
-  CommandReceiver,
   Receiver,
-  MethodReceiver,
   NamedRecordType,
   ServiceSchema,
   RecordDefinition,
@@ -18,10 +16,7 @@ export class Schema {
   private readonly records: Record<string, NamedRecordType> = {};
   private readonly recordClasses: Record<string, unknown> = {};
 
-  private readonly signals: string[] = [];
-
-  private readonly methods: Record<string, MethodReceiver> = {};
-  private readonly commands: Record<string, CommandReceiver> = {};
+  private readonly receivers: Record<string, Record<string, Receiver>> = {};
 
   constructor(
     private readonly serviceName: string,
@@ -37,10 +32,7 @@ export class Schema {
       name: this.serviceName,
       serializer: this.serializer,
       records: this.records,
-      receivers: [
-        ...Object.values(this.methods),
-        ...Object.values(this.commands),
-      ],
+      receivers: this.receivers,
     };
   }
 
@@ -52,7 +44,11 @@ export class Schema {
   static parse(schema: ServiceSchema): Schema {
     const result = new Schema(schema.name, schema.serializer);
     // Add receivers
-    schema.receivers.forEach((receiver) => result.addReceiver(receiver));
+    Object.entries(schema.receivers).forEach(([namespace, receivers]) => {
+      Object.values(receivers).forEach((receiver) =>
+        result.addReceiver(namespace, receiver)
+      );
+    });
     // Add records
     Object.values(schema.records).forEach((record) => result.addRecord(record));
 
@@ -81,36 +77,39 @@ export class Schema {
     }
   }
 
+  private verifyRecord() {
+    //
+  }
+
+  private verifyField() {
+    //
+  }
+
   /**
    * Add receiver into schema
    * @param receiver
    */
-  addReceiver(receiver: Receiver) {
+  addReceiver(namespace: string, receiver: Receiver) {
     this.validateLock();
     const { name } = receiver;
 
-    if (receiver.type === 'method') {
-      // Validate method
-      if (this.methods[name]) {
-        throw new Error(`Receiver method ${name} define duplicated`);
-      }
+    // Validate duplicated
+    if (this.receivers[namespace]?.[name]) {
+      throw new Error(`Receiver ${name} define duplicated`);
+    }
 
+    // Validate record
+    if (receiver.type === 'method') {
       this.validateRecord(receiver.input, `Method ${name} input`);
       this.validateRecord(receiver.output, `Method ${name} output`);
-
-      this.methods[name] = receiver;
     } else if (receiver.type === 'command') {
-      // Validate command
-      if (this.commands[name]) {
-        throw new Error(`Receiver command ${name} define duplicated`);
-      }
-
       this.validateRecord(receiver.record, `Command ${name}`);
-
-      this.commands[name] = receiver;
     } else {
       throw new Error(`Unknown receiver type`);
     }
+
+    if (this.receivers[namespace]) this.receivers[namespace][name] = receiver;
+    else this.receivers[namespace] = { [name]: receiver };
   }
 
   /**
@@ -144,8 +143,6 @@ export class Schema {
       } else {
         this.recordClasses[def.name] = record;
         this.records[def.name] = def;
-        // Add signal record
-        if (def.signal === true) this.signals.push(def.name);
 
         return def.name;
       }
@@ -158,8 +155,6 @@ export class Schema {
       }
 
       this.records[record.name] = record as NamedRecordType;
-      // Add signal record
-      if (record.signal === true) this.signals.push(record.name);
 
       return record.name;
     }
