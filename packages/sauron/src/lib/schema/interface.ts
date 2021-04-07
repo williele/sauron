@@ -19,10 +19,7 @@ export type ComplexType =
 
 export type SchemaType = PrimitiveType | PrimitiveType['type'] | ComplexType;
 
-export type NamedRecordType = Omit<
-  RecordType & { name: string; signal?: boolean },
-  'type'
->;
+export type NamedRecordType = Omit<RecordType & { name: string }, 'type'>;
 
 export type RecordDefinition = NamedRecordType | string | { new (...args) };
 
@@ -165,7 +162,8 @@ export interface UnionType extends BaseType {
 // Pointer
 export interface PointerType extends BaseType {
   type: 'pointer';
-  pointer: string;
+  ref?: string;
+  $ref?: { new (...args): unknown };
 }
 
 //
@@ -175,19 +173,16 @@ interface BaseReceiver {
   description?: string;
   deprecated?: boolean;
 }
-
-export interface MethodReceiver extends BaseReceiver {
-  type: 'method';
+export interface QueryReceiver extends BaseReceiver {
+  type: 'query';
   input: string;
   output: string;
 }
-
 export interface CommandReceiver extends BaseReceiver {
   type: 'command';
   record: string;
 }
-
-export type Receiver = MethodReceiver | CommandReceiver;
+export type Receiver = QueryReceiver | CommandReceiver;
 
 //
 // SCHEMA
@@ -195,5 +190,7 @@ export interface ServiceSchema {
   name: string;
   serializer: string;
   records: Record<string, NamedRecordType>;
-  receivers: Receiver[];
+  receivers: {
+    [namespace: string]: { [name: string]: Receiver };
+  };
 }

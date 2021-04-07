@@ -45,7 +45,7 @@ export function Field(order: number, config: SchemaType | { new (...args) }) {
         );
       }
 
-      field = { order, type: 'pointer', pointer: record.name, ref: config };
+      field = { order, type: 'pointer', $ref: config };
     } else {
       // Schema type as definition
       field = { order, ...config };
@@ -91,7 +91,7 @@ export function ArrayField(
       throw new Error(`Unknown ${items} as field. Make sure it used @Record`);
     }
 
-    item = { type: 'pointer', pointer: record.name, ref: items };
+    item = { type: 'pointer', $ref: items };
   } else {
     // Schema type as definition
     item = items;

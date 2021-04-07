@@ -52,11 +52,11 @@ describe('Schema decorators', () => {
     expect(fooSchema).toEqual({
       name: 'Foo',
       fields: {
-        baz: { order: 1, type: 'pointer', pointer: 'Baz', ref: Baz },
+        baz: { order: 1, type: 'pointer', $ref: Baz },
         bar: {
           order: 2,
           type: 'array',
-          items: { type: 'pointer', pointer: 'Barr', ref: Bar },
+          items: { type: 'pointer', $ref: Bar },
         },
         numberList: { order: 3, type: 'array', items: { type: 'float' } },
         longList: { order: 4, type: 'array', items: { type: 'long', min: 10 } },
