@@ -1,3 +1,3 @@
-export function sauron(): string {
-  return 'sauron';
+export class Sauron {
+  //
 }

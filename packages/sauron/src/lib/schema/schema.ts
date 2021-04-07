@@ -250,6 +250,15 @@ export class Schema {
   }
 
   /**
+   * Get a record schema by name
+   * @param name
+   * @returns
+   */
+  getRecord(name: string): NamedRecordType {
+    return this.records[name];
+  }
+
+  /**
    * Add receiver into schema
    * @param receiver
    */
