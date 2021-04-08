@@ -25,6 +25,7 @@
             "outputPath": "dist/packages/sauron",
             "tsConfig": "packages/sauron/tsconfig.lib.json",
             "packageJson": "packages/sauron/package.json",
+            "updateBuildableProjectDepsInPackageJson": false,
             "main": "packages/sauron/src/index.ts",
             "assets": ["packages/sauron/*.md"]
           }

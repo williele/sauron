@@ -1,4 +1,7 @@
 {
   "name": "@williele/sauron",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "dependencies": {
+    "avsc": "^5.6.1"
+  }
 }
